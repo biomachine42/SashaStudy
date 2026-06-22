@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Шуточные предсказания на день: выпей кофе с подругой, найди деньги в кармане куртки и узнай свой настрой. Нажми кнопку — получи предсказание!">
 <title>Предсказание на день</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%AA%A9</text></svg>">
 <style>
@@ -54,8 +55,10 @@
   .stat .value { font-size: 1.3rem; font-weight: 700; color: var(--accent); margin-top: 4px; }
   .color-dot {
     display: inline-block; width: 22px; height: 22px; border-radius: 50%;
-    margin-top: 6px; border: 2px solid rgba(255,255,255,0.5);
+    border: 2px solid rgba(255,255,255,0.5); vertical-align: middle;
   }
+  .color-name { display: block; font-size: 0.8rem; margin-top: 6px; }
+  .mood { font-size: 1.5rem; }
   button {
     width: 100%; padding: 15px; border: none; border-radius: 14px;
     background: var(--accent); color: #fff; font-size: 1.05rem; font-weight: 700;
@@ -71,7 +74,7 @@
   <div class="card">
     <h1>🪩 Предсказание на день</h1>
     <div class="date" id="date"></div>
-    <div class="prediction" id="prediction">Нажми кнопку, чтобы узнать своё предсказание ✨</div>
+    <div class="prediction" id="prediction" aria-live="polite">Нажми кнопку, чтобы узнать своё предсказание ✨</div>
     <div class="stats">
       <div class="stat">
         <div class="label">Число дня</div>
@@ -79,11 +82,14 @@
       </div>
       <div class="stat">
         <div class="label">Цвет дня</div>
-        <div class="value"><span class="color-dot" id="luckyColor"></span></div>
+        <div class="value">
+          <span class="color-dot" id="luckyColor"></span>
+          <span class="color-name" id="luckyColorName">—</span>
+        </div>
       </div>
       <div class="stat">
         <div class="label">Настрой</div>
-        <div class="value" id="mood" style="font-size:1.5rem">—</div>
+        <div class="value mood" id="mood">—</div>
       </div>
     </div>
     <button id="go">Узнать предсказание</button>
@@ -202,24 +208,38 @@ const COLORS = [
 
 function rnd(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
+// Выбор случайного предсказания, но не такого же, как предыдущее
+let lastPrediction = -1;
+function nextPrediction() {
+  let i;
+  do { i = Math.floor(Math.random() * PREDICTIONS.length); }
+  while (i === lastPrediction && PREDICTIONS.length > 1);
+  lastPrediction = i;
+  return PREDICTIONS[i];
+}
+
 function generate() {
   const p = document.getElementById("prediction");
   p.classList.remove("show");
   setTimeout(() => {
-    p.textContent = rnd(PREDICTIONS);
+    p.textContent = nextPrediction();
     p.classList.add("show");
     document.getElementById("luckyNum").textContent = Math.floor(Math.random()*9)+1;
     document.getElementById("mood").textContent = rnd(MOODS);
     const c = rnd(COLORS);
     const dot = document.getElementById("luckyColor");
     dot.style.background = c[1];
-    dot.title = c[0];
+    document.getElementById("luckyColorName").textContent = c[0];
   }, 150);
 }
 
-const d = new Date();
-document.getElementById("date").textContent =
-  d.toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
+// Показ даты (обновляется, если страница открыта со вчера)
+function showDate() {
+  document.getElementById("date").textContent =
+    new Date().toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
+}
+showDate();
+setInterval(showDate, 60 * 1000);
 
 document.getElementById("go").addEventListener("click", generate);
 
@@ -232,6 +252,7 @@ const stars = Array.from({length: 80}, () => ({
   x: Math.random()*cv.width, y: Math.random()*cv.height,
   r: Math.random()*1.5+0.3, a: Math.random()
 }));
+let animId = null;
 function draw(){
   ctx.clearRect(0,0,cv.width,cv.height);
   for (const s of stars){
@@ -242,9 +263,18 @@ function draw(){
     ctx.fillStyle = "rgba(255,255,255," + s.a + ")";
     ctx.fill();
   }
-  requestAnimationFrame(draw);
+  animId = requestAnimationFrame(draw);
 }
 draw();
+
+// Пауза анимации, когда вкладка не активна — бережём батарею
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    cancelAnimationFrame(animId);
+  } else if (animId !== null) {
+    draw();
+  }
+});
 </script>
 </body>
 </html>
