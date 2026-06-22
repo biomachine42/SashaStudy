@@ -10,10 +10,35 @@
   const ctx = cv.getContext("2d");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const stars = Array.from({ length: 80 }, () => ({
-    x: Math.random() * innerWidth, y: Math.random() * innerHeight,
-    r: Math.random() * 1.5 + 0.3, a: Math.random()
-  }));
+  function genStars() {
+    return Array.from({ length: 80 }, () => ({
+      x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+      r: Math.random() * 1.5 + 0.3, a: Math.random()
+    }));
+  }
+
+  // Перезагрузка страницы (F5) — да, переход между вкладками — нет
+  function isReload() {
+    const navEntry = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+    if (navEntry) return navEntry.type === "reload";
+    return performance.navigation && performance.navigation.type === 1;
+  }
+
+  // Звёзды сохраняются на время вкладки: при переходе между страницами
+  // остаются на месте, обновляются только при перезагрузке или новом открытии.
+  let stars;
+  try {
+    const saved = sessionStorage.getItem("starfield");
+    if (saved && !isReload()) {
+      stars = JSON.parse(saved);
+    } else {
+      stars = genStars();
+      sessionStorage.setItem("starfield", JSON.stringify(stars));
+    }
+  } catch (e) {
+    stars = genStars(); // если хранилище недоступно — просто генерируем
+  }
+
   let animId = null;
 
   function paint(animate) {

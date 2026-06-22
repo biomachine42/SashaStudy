@@ -62,7 +62,7 @@
     opacity: 0; transition: opacity 0.45s;
   }
   .meaning.show { opacity: 1; }
-  .hint { margin: 0 0 14px; }
+  .meaning.placeholder { opacity: 1; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -77,15 +77,17 @@
       <h1>🃏 Карта дня</h1>
       <div class="date" id="date"></div>
 
-      <div class="stage" id="stage">
-        <div class="tarot placeholder" id="tarot">
-          <div class="num">Таро Уэйта</div>
-          <div class="symbol">🔮</div>
-          <div class="cname">78 карт</div>
+      <div class="card-body">
+        <div class="stage" id="stage">
+          <div class="tarot placeholder" id="tarot">
+            <div class="num">Таро Уэйта</div>
+            <div class="symbol">🔮</div>
+            <div class="cname">78 карт</div>
+          </div>
         </div>
-      </div>
 
-      <p class="meaning" id="meaning" aria-live="polite"></p>
+        <p class="meaning placeholder" id="meaning" aria-live="polite">Карта расскажет, что готовит грядущий день</p>
+      </div>
 
       <div class="hint">Вдохни, задумай свой день и тяни карту ✨</div>
       <button type="button" id="go">Тянуть карту</button>
@@ -247,7 +249,7 @@ function reveal() {
   go.disabled = true;
 
   // 1. Прячем прошлый результат
-  meaning.classList.remove("show");
+  meaning.classList.remove("show", "placeholder");
   tarot.classList.remove("placeholder", "reveal", "show");
 
   // 2. Магия: рубашка дрожит и светится + искры

@@ -28,7 +28,6 @@
   }
   .color-name { display: block; font-size: 0.8rem; margin-top: 6px; }
   .mood { font-size: 1.5rem; }
-  .hint { margin-top: 14px; }
 </style>
 </head>
 <body>
@@ -42,26 +41,28 @@
       </nav>
       <h1>🪩 Предсказание на день</h1>
       <div class="date" id="date"></div>
-      <p class="prediction placeholder" id="prediction" aria-live="polite">Что приготовил сегодняшний день?</p>
-      <div class="stats">
-        <div class="stat">
-          <div class="label">Число дня</div>
-          <div class="value" id="luckyNum">—</div>
-        </div>
-        <div class="stat">
-          <div class="label">Цвет дня</div>
-          <div class="value">
-            <span class="color-dot" id="luckyColor"></span>
-            <span class="color-name" id="luckyColorName">—</span>
+      <div class="card-body">
+        <p class="prediction placeholder" id="prediction" aria-live="polite">Что приготовил сегодняшний день?</p>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Число дня</div>
+            <div class="value" id="luckyNum">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Цвет дня</div>
+            <div class="value">
+              <span class="color-dot" id="luckyColor"></span>
+              <span class="color-name" id="luckyColorName">—</span>
+            </div>
+          </div>
+          <div class="stat">
+            <div class="label">Настрой</div>
+            <div class="value mood" id="mood">—</div>
           </div>
         </div>
-        <div class="stat">
-          <div class="label">Настрой</div>
-          <div class="value mood" id="mood">—</div>
-        </div>
       </div>
-      <button type="button" id="go">Узнать предсказание</button>
       <div class="hint">Нажимай сколько хочешь — каждый раз новое ✨</div>
+      <button type="button" id="go">Узнать предсказание</button>
     </div>
   </main>
 
