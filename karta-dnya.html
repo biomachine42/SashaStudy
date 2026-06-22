@@ -6,51 +6,11 @@
 <meta name="description" content="Карта дня по Таро Уэйта: полная колода из 78 карт. Вытяни аркан и получи толкование на день — совет, настроение и фокус дня.">
 <title>Карта дня — Таро Уэйта</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48Y2xpcFBhdGggaWQ9ImMiPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTIiIHI9IjQwIi8+PC9jbGlwUGF0aD48L2RlZnM+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MiIgcj0iNDAiIGZpbGw9IiMyQTlGRkYiLz48ZyBjbGlwLXBhdGg9InVybCgjYykiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLW9wYWNpdHk9IjAuNTUiIHN0cm9rZS13aWR0aD0iMi4yIiBmaWxsPSJub25lIj48bGluZSB4MT0iOCIgeTE9IjUyIiB4Mj0iOTIiIHkyPSI1MiIvPjxsaW5lIHgxPSI4IiB5MT0iMzQiIHgyPSI5MiIgeTI9IjM0Ii8+PGxpbmUgeDE9IjgiIHkxPSI3MCIgeDI9IjkyIiB5Mj0iNzAiLz48bGluZSB4MT0iMzIiIHkxPSI4IiB4Mj0iMzIiIHkyPSI5NiIvPjxsaW5lIHgxPSI1MCIgeTE9IjgiIHgyPSI1MCIgeTI9Ijk2Ii8+PGxpbmUgeDE9IjY4IiB5MT0iOCIgeDI9IjY4IiB5Mj0iOTYiLz48L2c+PGNpcmNsZSBjeD0iMzciIGN5PSIzOSIgcj0iNi41IiBmaWxsPSIjZmZmZmZmIiBmaWxsLW9wYWNpdHk9IjAuODUiLz48L3N2Zz4=">
+<link rel="stylesheet" href="style.css">
 <style>
-  :root {
-    --accent: #2A9FFF;
-    --bg1: #0a1830;
-    --bg2: #102a52;
-    --card: rgba(255, 255, 255, 0.08);
-    --text: #eef4ff;
-    --muted: #9db8e0;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    color: var(--text);
-    background: radial-gradient(circle at 25% 15%, var(--bg2), var(--bg1));
-    overflow-x: hidden;
-  }
-  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-  .content {
-    flex: 1;
-    position: relative; z-index: 1;
-    display: flex; align-items: center; justify-content: center;
-    width: 100%; padding: 20px;
-  }
-  .card {
-    width: 100%; max-width: 440px;
-    background: var(--card);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 24px;
-    padding: 36px 30px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-    display: flex; flex-direction: column; justify-content: center;
-    min-height: 560px; /* одинаково на всех страницах — высота не «прыгает» */
-  }
-  h1 { font-size: 1.5rem; margin-bottom: 4px; }
-  .date { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
-
-  /* Сцена карты (для искр вокруг) */
+  /* Стили только для страницы «Карта дня» */
   .stage { position: relative; width: 190px; margin: 0 auto 22px; }
 
-  /* Карта Таро */
   .tarot {
     width: 100%;
     aspect-ratio: 1 / 1;
@@ -102,50 +62,7 @@
     opacity: 0; transition: opacity 0.45s;
   }
   .meaning.show { opacity: 1; }
-
-  button {
-    width: 100%; padding: 15px; border: none; border-radius: 14px;
-    background: var(--accent); color: #fff; font-size: 1.05rem; font-weight: 700;
-    cursor: pointer; transition: transform 0.1s, filter 0.2s;
-  }
-  button:hover { filter: brightness(1.08); }
-  button:active { transform: scale(0.98); }
-  button:disabled { opacity: 0.6; cursor: default; }
-  .hint { color: var(--muted); font-size: 0.75rem; margin: 0 0 14px; }
-
-  /* Меню навигации между страницами */
-  .nav { display: flex; gap: 8px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
-  .nav a {
-    color: var(--muted); text-decoration: none; font-size: 0.85rem;
-    padding: 7px 14px; border-radius: 999px; transition: background 0.2s, color 0.2s;
-  }
-  .nav a:hover { color: var(--text); }
-  .nav a.active { background: var(--accent); color: #fff; }
-
-  /* ===== ОБЩИЙ ПОДВАЛ (одинаковый на всех страницах) ===== */
-  .site-footer {
-    position: relative; z-index: 1;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    padding: 30px 36px 44px;
-  }
-  .site-footer .tg {
-    display: inline-block;
-    color: var(--accent); text-decoration: none;
-    font-size: 1.4rem; font-weight: 600;
-    transition: filter 0.2s;
-  }
-  .site-footer .tg:hover { filter: brightness(1.2); text-decoration: underline; }
-  .site-footer .rock {
-    margin-top: 24px;
-    font-size: clamp(3.5rem, 16vw, 11rem);
-    font-weight: 800; color: var(--text);
-    letter-spacing: -0.03em; line-height: 0.9;
-  }
-  /* ====================================================== */
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
-  }
+  .hint { margin: 0 0 14px; }
 </style>
 </head>
 <body>
@@ -346,10 +263,14 @@ function reveal() {
     tarot.classList.remove("shuffling");
     tarot.classList.add("reveal");
     tarot.innerHTML =
-      '<div class="num">' + num + '</div>' +
-      '<div class="symbol">' + symbol + '</div>' +
-      '<div class="cname">' + name + '</div>';
-    meaning.textContent = text;
+      '<div class="num"></div><div class="symbol"></div><div class="cname"></div>';
+    tarot.querySelector(".num").textContent = num;
+    tarot.querySelector(".symbol").textContent = symbol;
+    tarot.querySelector(".cname").textContent = name;
+    // Озвучка для скринридера: название карты + толкование
+    meaning.innerHTML = '<span class="sr-only"></span>';
+    meaning.querySelector(".sr-only").textContent = "Карта: " + num + " " + name + ". ";
+    meaning.appendChild(document.createTextNode(text));
     requestAnimationFrame(() => {
       tarot.classList.add("show");
       meaning.classList.add("show");
@@ -368,51 +289,8 @@ showDate();
 setInterval(showDate, 60 * 1000);
 
 go.addEventListener("click", reveal);
-
-// Звёздный фон
-const cv = document.getElementById("stars");
-const ctx = cv.getContext("2d");
-const stars = Array.from({length: 80}, () => ({
-  x: Math.random()*innerWidth, y: Math.random()*innerHeight,
-  r: Math.random()*1.5+0.3, a: Math.random()
-}));
-let animId = null;
-
-function paint(animate){
-  ctx.clearRect(0,0,cv.width,cv.height);
-  for (const s of stars){
-    if (animate){
-      s.a += (Math.random()-0.5)*0.05;
-      s.a = Math.max(0.1, Math.min(1, s.a));
-    }
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-    ctx.fillStyle = "rgba(255,255,255," + s.a + ")";
-    ctx.fill();
-  }
-}
-function animateStars(){
-  paint(true);
-  animId = requestAnimationFrame(animateStars);
-}
-function resize(){
-  cv.width = innerWidth; cv.height = innerHeight;
-  if (reduceMotion) paint(false);
-}
-
-resize();
-addEventListener("resize", resize);
-
-if (reduceMotion) {
-  paint(false);
-} else {
-  animateStars();
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) cancelAnimationFrame(animId);
-    else animateStars();
-  });
-}
 })();
 </script>
+<script src="app.js"></script>
 </body>
 </html>
