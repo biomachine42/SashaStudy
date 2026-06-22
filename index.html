@@ -20,16 +20,20 @@
     font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+    flex-direction: column;
     color: var(--text);
     background: radial-gradient(circle at 25% 15%, var(--bg2), var(--bg1));
     overflow-x: hidden;
   }
   .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-  .card {
+  /* Основной блок: занимает всё свободное место и центрирует карточку */
+  .content {
+    flex: 1;
     position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; padding: 20px;
+  }
+  .card {
     width: 100%; max-width: 440px;
     background: var(--card);
     backdrop-filter: blur(12px);
@@ -49,6 +53,7 @@
     transition: opacity 0.4s, transform 0.4s;
   }
   .prediction.show { opacity: 1; transform: translateY(0); }
+  .prediction.placeholder { opacity: 1; transform: none; color: var(--muted); }
   .stats { display: flex; gap: 12px; margin-bottom: 24px; }
   .stat { flex: 1; background: rgba(0,0,0,0.25); border-radius: 14px; padding: 14px 8px; }
   .stat .label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -67,6 +72,37 @@
   button:hover { filter: brightness(1.08); }
   button:active { transform: scale(0.98); }
   .hint { color: var(--muted); font-size: 0.75rem; margin-top: 14px; }
+
+  /* Меню навигации между страницами */
+  .nav { display: flex; gap: 8px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
+  .nav a {
+    color: var(--muted); text-decoration: none; font-size: 0.85rem;
+    padding: 7px 14px; border-radius: 999px; transition: background 0.2s, color 0.2s;
+  }
+  .nav a:hover { color: var(--text); }
+  .nav a.active { background: var(--accent); color: #fff; }
+
+  /* ===== ОБЩИЙ ПОДВАЛ (одинаковый на всех страницах) ===== */
+  .site-footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 30px 36px 44px;
+  }
+  .site-footer .tg {
+    display: inline-block;
+    color: var(--accent); text-decoration: none;
+    font-size: 1.4rem; font-weight: 600;
+    transition: filter 0.2s;
+  }
+  .site-footer .tg:hover { filter: brightness(1.2); text-decoration: underline; }
+  .site-footer .rock {
+    margin-top: 24px;
+    font-size: clamp(3.5rem, 16vw, 11rem);
+    font-weight: 800; color: var(--text);
+    letter-spacing: -0.03em; line-height: 0.9;
+  }
+  /* ====================================================== */
+
   /* Уважаем системную настройку «уменьшить движение» */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -75,30 +111,44 @@
 </head>
 <body>
   <canvas class="stars" id="stars" aria-hidden="true"></canvas>
-  <div class="card">
-    <h1>🪩 Предсказание на день</h1>
-    <div class="date" id="date"></div>
-    <p class="prediction" id="prediction" aria-live="polite">Нажми кнопку, чтобы узнать своё предсказание ✨</p>
-    <div class="stats">
-      <div class="stat">
-        <div class="label">Число дня</div>
-        <div class="value" id="luckyNum">—</div>
-      </div>
-      <div class="stat">
-        <div class="label">Цвет дня</div>
-        <div class="value">
-          <span class="color-dot" id="luckyColor"></span>
-          <span class="color-name" id="luckyColorName">—</span>
+
+  <main class="content">
+    <div class="card">
+      <nav class="nav">
+        <a href="index.html" class="active">Предсказание</a>
+        <a href="karta-dnya.html">Карта дня</a>
+      </nav>
+      <h1>🪩 Предсказание на день</h1>
+      <div class="date" id="date"></div>
+      <p class="prediction placeholder" id="prediction" aria-live="polite">Что приготовил сегодняшний день?</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="label">Число дня</div>
+          <div class="value" id="luckyNum">—</div>
+        </div>
+        <div class="stat">
+          <div class="label">Цвет дня</div>
+          <div class="value">
+            <span class="color-dot" id="luckyColor"></span>
+            <span class="color-name" id="luckyColorName">—</span>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="label">Настрой</div>
+          <div class="value mood" id="mood">—</div>
         </div>
       </div>
-      <div class="stat">
-        <div class="label">Настрой</div>
-        <div class="value mood" id="mood">—</div>
-      </div>
+      <button type="button" id="go">Узнать предсказание</button>
+      <div class="hint">Нажимай сколько хочешь — каждый раз новое ✨</div>
     </div>
-    <button type="button" id="go">Узнать предсказание</button>
-    <div class="hint">Нажимай сколько хочешь — каждый раз новое ✨</div>
-  </div>
+  </main>
+
+  <!-- ===== ОБЩИЙ ПОДВАЛ — копируй этот блок на каждую страницу ===== -->
+  <footer class="site-footer">
+    <a class="tg" href="https://t.me/sashaaaromanov" target="_blank" rel="noopener">Telegram</a>
+    <div class="rock">let&rsquo;s rock</div>
+  </footer>
+  <!-- ============================================================ -->
 
 <script>
 (function () {
@@ -227,7 +277,7 @@ function nextPrediction() {
 
 function generate() {
   const p = document.getElementById("prediction");
-  p.classList.remove("show");
+  p.classList.remove("show", "placeholder");
   setTimeout(() => {
     p.textContent = nextPrediction();
     p.classList.add("show");

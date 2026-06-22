@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Карта дня по Таро Уэйта: полная колода из 78 карт. Вытяни аркан и получи толкование на день — совет, настроение и фокус дня.">
+<title>Карта дня — Таро Уэйта</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48ZGVmcz48Y2xpcFBhdGggaWQ9ImMiPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTIiIHI9IjQwIi8+PC9jbGlwUGF0aD48L2RlZnM+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MiIgcj0iNDAiIGZpbGw9IiMyQTlGRkYiLz48ZyBjbGlwLXBhdGg9InVybCgjYykiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLW9wYWNpdHk9IjAuNTUiIHN0cm9rZS13aWR0aD0iMi4yIiBmaWxsPSJub25lIj48bGluZSB4MT0iOCIgeTE9IjUyIiB4Mj0iOTIiIHkyPSI1MiIvPjxsaW5lIHgxPSI4IiB5MT0iMzQiIHgyPSI5MiIgeTI9IjM0Ii8+PGxpbmUgeDE9IjgiIHkxPSI3MCIgeDI9IjkyIiB5Mj0iNzAiLz48bGluZSB4MT0iMzIiIHkxPSI4IiB4Mj0iMzIiIHkyPSI5NiIvPjxsaW5lIHgxPSI1MCIgeTE9IjgiIHgyPSI1MCIgeTI9Ijk2Ii8+PGxpbmUgeDE9IjY4IiB5MT0iOCIgeDI9IjY4IiB5Mj0iOTYiLz48L2c+PGNpcmNsZSBjeD0iMzciIGN5PSIzOSIgcj0iNi41IiBmaWxsPSIjZmZmZmZmIiBmaWxsLW9wYWNpdHk9IjAuODUiLz48L3N2Zz4=">
+<style>
+  :root {
+    --accent: #2A9FFF;
+    --bg1: #0a1830;
+    --bg2: #102a52;
+    --card: rgba(255, 255, 255, 0.08);
+    --text: #eef4ff;
+    --muted: #9db8e0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--text);
+    background: radial-gradient(circle at 25% 15%, var(--bg2), var(--bg1));
+    overflow-x: hidden;
+  }
+  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .content {
+    flex: 1;
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; padding: 20px;
+  }
+  .card {
+    width: 100%; max-width: 440px;
+    background: var(--card);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 24px;
+    padding: 36px 30px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  .date { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+
+  /* Сцена карты (для искр вокруг) */
+  .stage { position: relative; width: 190px; margin: 0 auto 22px; }
+
+  /* Карта Таро */
+  .tarot {
+    width: 100%;
+    aspect-ratio: 10 / 17;
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.45);
+    background:
+      radial-gradient(circle at 50% 30%, rgba(42,159,255,0.25), transparent 60%),
+      linear-gradient(160deg, #16335f, #0a1830);
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    padding: 16px 12px;
+    box-shadow: 0 12px 34px rgba(0,0,0,0.5);
+  }
+  .tarot.reveal { opacity: 0; transform: rotateY(90deg); transition: opacity 0.45s, transform 0.45s; }
+  .tarot.reveal.show { opacity: 1; transform: rotateY(0); }
+  .tarot .num { font-size: 0.9rem; color: var(--accent); font-weight: 800; letter-spacing: 1px; }
+  .tarot .symbol { font-size: 4rem; line-height: 1; }
+  .tarot .cname { font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tarot.placeholder .symbol { font-size: 3.2rem; opacity: 0.5; }
+  .tarot.placeholder .num, .tarot.placeholder .cname { opacity: 0.6; }
+
+  /* Магия: перемешивание (рубашка дрожит и светится) */
+  .tarot.shuffling { animation: wiggle 0.22s ease-in-out infinite, glow 0.85s ease-in-out infinite; }
+  @keyframes wiggle { 0%,100% { transform: rotate(-2.5deg) scale(1.02); } 50% { transform: rotate(2.5deg) scale(1.02); } }
+  @keyframes glow {
+    0%,100% { box-shadow: 0 12px 34px rgba(0,0,0,0.5), 0 0 0 rgba(42,159,255,0); }
+    50%     { box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 34px 6px rgba(42,159,255,0.75); }
+  }
+  .back {
+    width: 100%; height: 100%; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    background: repeating-linear-gradient(45deg, #16335f 0 9px, #1d4378 9px 18px);
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .back-glyph { font-size: 2.8rem; color: var(--accent); animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Искорки */
+  .spark { position: absolute; left: 50%; top: 45%; font-size: 1.1rem; pointer-events: none; opacity: 0; }
+  .spark.go { animation: sparkfly 1s ease-out forwards; }
+  @keyframes sparkfly {
+    0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.3); }
+    25%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.3); }
+  }
+
+  .meaning {
+    font-size: 1.05rem; line-height: 1.55; color: var(--text);
+    min-height: 70px; margin-bottom: 24px;
+    opacity: 0; transition: opacity 0.45s;
+  }
+  .meaning.show { opacity: 1; }
+
+  button {
+    width: 100%; padding: 15px; border: none; border-radius: 14px;
+    background: var(--accent); color: #fff; font-size: 1.05rem; font-weight: 700;
+    cursor: pointer; transition: transform 0.1s, filter 0.2s;
+  }
+  button:hover { filter: brightness(1.08); }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.6; cursor: default; }
+  .hint { color: var(--muted); font-size: 0.75rem; margin: 0 0 14px; }
+
+  /* Меню навигации между страницами */
+  .nav { display: flex; gap: 8px; justify-content: center; margin-bottom: 22px; flex-wrap: wrap; }
+  .nav a {
+    color: var(--muted); text-decoration: none; font-size: 0.85rem;
+    padding: 7px 14px; border-radius: 999px; transition: background 0.2s, color 0.2s;
+  }
+  .nav a:hover { color: var(--text); }
+  .nav a.active { background: var(--accent); color: #fff; }
+
+  /* ===== ОБЩИЙ ПОДВАЛ (одинаковый на всех страницах) ===== */
+  .site-footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 30px 36px 44px;
+  }
+  .site-footer .tg {
+    display: inline-block;
+    color: var(--accent); text-decoration: none;
+    font-size: 1.4rem; font-weight: 600;
+    transition: filter 0.2s;
+  }
+  .site-footer .tg:hover { filter: brightness(1.2); text-decoration: underline; }
+  .site-footer .rock {
+    margin-top: 24px;
+    font-size: clamp(3.5rem, 16vw, 11rem);
+    font-weight: 800; color: var(--text);
+    letter-spacing: -0.03em; line-height: 0.9;
+  }
+  /* ====================================================== */
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+  <canvas class="stars" id="stars" aria-hidden="true"></canvas>
+
+  <main class="content">
+    <div class="card">
+      <nav class="nav">
+        <a href="index.html">Предсказание</a>
+        <a href="karta-dnya.html" class="active">Карта дня</a>
+      </nav>
+      <h1>🃏 Карта дня</h1>
+      <div class="date" id="date"></div>
+
+      <div class="stage" id="stage">
+        <div class="tarot placeholder" id="tarot">
+          <div class="num">Таро Уэйта</div>
+          <div class="symbol">🔮</div>
+          <div class="cname">78 карт</div>
+        </div>
+      </div>
+
+      <p class="meaning" id="meaning" aria-live="polite"></p>
+
+      <div class="hint">Вдохни, задумай свой день и тяни карту ✨</div>
+      <button type="button" id="go">Тянуть карту</button>
+    </div>
+  </main>
+
+  <!-- ===== ОБЩИЙ ПОДВАЛ — копируй этот блок на каждую страницу ===== -->
+  <footer class="site-footer">
+    <a class="tg" href="https://t.me/sashaaaromanov" target="_blank" rel="noopener">Telegram</a>
+    <div class="rock">let&rsquo;s rock</div>
+  </footer>
+  <!-- ============================================================ -->
+
+<script>
+(function () {
+"use strict";
+
+/* ===== СТАРШИЕ АРКАНЫ (22): [номер, название, символ, толкование на день] ===== */
+const MAJORS = [
+  ["0", "Шут", "🎒", "Сегодня день новых начинаний и лёгкости. Доверься потоку и не бойся шагнуть в неизвестность."],
+  ["I", "Маг", "🪄", "У тебя есть все инструменты, чтобы воплотить задуманное. Действуй уверенно — сегодня твоя воля творит результат."],
+  ["II", "Верховная Жрица", "🌙", "Прислушайся к интуиции и тишине внутри. Ответы придут через наблюдение, а не через спешку."],
+  ["III", "Императрица", "🌷", "День изобилия, заботы и творчества. Позволь себе наслаждаться и создавать красоту."],
+  ["IV", "Император", "👑", "Время структуры и порядка. Возьми ответственность — и дела пойдут по плану."],
+  ["V", "Иерофант", "🗝️", "Сегодня помогут опыт наставников и проверенные пути. Учись у тех, кто прошёл раньше."],
+  ["VI", "Влюблённые", "💞", "День выбора и гармонии в отношениях. Слушай сердце — решай в согласии с собой."],
+  ["VII", "Колесница", "🏇", "Соберись и двигайся к цели. Победа за тем, кто держит фокус и контролирует направление."],
+  ["VIII", "Сила", "🦁", "Истинная сила — в мягкости и терпении. Справишься спокойствием, а не напором."],
+  ["IX", "Отшельник", "🕯️", "День уединения и поиска. Замедлись, побудь наедине с собой — там найдёшь ответ."],
+  ["X", "Колесо Фортуны", "🎡", "Перемены уже в пути. Прими поворот судьбы с открытостью — он ведёт куда нужно."],
+  ["XI", "Справедливость", "⚖️", "Сегодня важны честность и баланс. То, что отдаёшь, вернётся сполна."],
+  ["XII", "Повешенный", "🙃", "Взгляни на ситуацию под новым углом. Пауза откроет неожиданное решение."],
+  ["XIII", "Смерть", "🦋", "День завершения и трансформации. Отпусти отжившее — это освобождает место для нового."],
+  ["XIV", "Умеренность", "🍷", "Ищи золотую середину. Спокойствие и баланс сегодня принесут больше, чем крайности."],
+  ["XV", "Дьявол", "🔗", "Обрати внимание на то, что тебя сковывает — привычки, страхи. Осознание уже ослабляет цепи."],
+  ["XVI", "Башня", "⚡", "Возможен внезапный слом старого. То, что рушится, мешало настоящему обновлению."],
+  ["XVII", "Звезда", "⭐", "День надежды и вдохновения. Верь в лучшее — твои желания ближе, чем кажется."],
+  ["XVIII", "Луна", "🌕", "Не всё ясно сразу. Доверяй ощущениям, но не спеши с выводами — туман рассеется."],
+  ["XIX", "Солнце", "☀️", "Светлый и радостный день. Успех и тепло — позволь себе сиять и делиться этим."],
+  ["XX", "Суд", "🎺", "Время переосмысления и второго шанса. Сегодня можно начать заново с чистого листа."],
+  ["XXI", "Мир", "🌍", "День завершения цикла и гармонии. Ты на верном пути — почувствуй целостность."]
+];
+
+/* ===== МЛАДШИЕ АРКАНЫ (56): собираем из рангов и мастей ===== */
+const RANKS = ["1","2","3","4","5","6","7","8","9","10","Паж","Рыцарь","Королева","Король"];
+
+const SUITS = [
+  { gen: "Жезлы", emoji: "🔥", means: [
+    "Вспышка вдохновения! Родится новая идея — хватай искру и действуй, пока горит.",
+    "День планов и выбора пути. Осмотрись и реши, куда направить энергию.",
+    "Твои усилия начинают расширяться. Жди первых результатов и смотри вперёд.",
+    "Повод для радости и тепла. Отметь достигнутое, побудь с близкими.",
+    "Возможны мелкие стычки и соперничество. Это спарринг, а не война.",
+    "День победы и признания. Тебя оценят по заслугам — прими похвалу.",
+    "Придётся отстоять свою позицию. Стой на своём — преимущество у тебя.",
+    "Всё ускоряется: новости, события, движение. Лови момент и действуй.",
+    "Ты почти у цели, хоть и устал(а). Соберись на последний рывок.",
+    "Ты взвалил(а) слишком много. Раздели ношу или отпусти лишнее.",
+    "Загорись новым любопытством. Сегодня хорошо пробовать и дерзать.",
+    "Энергия бьёт ключом — вперёд, к приключению! Только не руби сгоряча.",
+    "Твоё обаяние сегодня магнетит людей. Сияй и веди за собой.",
+    "Возьми роль лидера. Видение плюс смелость — и за тобой пойдут."
+  ]},
+  { gen: "Кубки", emoji: "💧", means: [
+    "Сердце открывается навстречу новому. Впусти любовь, тепло, вдохновение.",
+    "День близости и взаимности. Союз или примирение принесут радость.",
+    "Время праздника в кругу своих. Раздели радость с друзьями.",
+    "Лёгкая хандра. Оглянись — возможно, ты не замечаешь хорошее рядом.",
+    "Не зацикливайся на потере. Часть чаш ещё полна — повернись к ней.",
+    "День тёплых воспоминаний и доброты. Подари кому-то заботу.",
+    "Перед тобой много заманчивых вариантов. Не витай в мечтах — выбери реальное.",
+    "Пора уйти от того, что больше не наполняет. Ищи глубину, а не привычку.",
+    "Карта исполнения желаний. Позволь себе удовольствие и благодарность.",
+    "Эмоциональная гармония и тепло дома. Цени тех, кто рядом.",
+    "Прислушайся к чувствам — придёт нежная весточка или идея.",
+    "Следуй за сердцем. День романтики, красивых жестов и вдохновения.",
+    "Будь чутким(ой) к себе и другим. Твоя забота сегодня лечит.",
+    "Сохраняй эмоциональное равновесие. Спокойствие и дипломатия решат всё."
+  ]},
+  { gen: "Мечи", emoji: "⚔️", means: [
+    "Ясность как удар клинка. Сегодня придёт прорыв, правда или верное решение.",
+    "Ты застрял(а) в выборе. Посмотри на факты и реши.",
+    "Возможна грусть или горькая правда. Проживи её — после станет легче.",
+    "День отдыха и восстановления. Остановись, выдохни, наберись сил.",
+    "Берегись конфликтов, где победа дороже отношений. Иногда уступить — мудрее.",
+    "Ты движешься от бури к спокойствию. Перемены ведут к лучшему.",
+    "Действуй с умом и осторожностью. Стратегия важнее силы.",
+    "Ощущение ловушки чаще в голове, чем вокруг. Сделай шаг — путь свободен.",
+    "Тревога раздувает страхи. Многое из того, что мучает ночью, не сбудется.",
+    "Тяжёлый финал — но это дно, от которого отталкиваются. Впереди рассвет.",
+    "Будь любопытен(на) и внимателен(на). Свежий взгляд раскроет важное.",
+    "Напор зашкаливает. Мчись к цели, но думай на ходу.",
+    "Суди трезво и честно. Ясный ум сегодня — твой главный союзник.",
+    "Опирайся на логику и истину. Принимай решения по справедливости."
+  ]},
+  { gen: "Пентакли", emoji: "🪙", means: [
+    "Новая возможность — деньги, работа, проект. Зерно посеяно, дай ему прорасти.",
+    "Жонглируешь делами? Сохраняй баланс и гибкость, всё успеется.",
+    "День командной работы и мастерства. Вместе вы сделаете больше.",
+    "Стабильность важна, но не вцепляйся слишком крепко. Деньги любят движение.",
+    "Если трудно — помощь ближе, чем кажется. Не стесняйся попросить.",
+    "День щедрости и обмена. Дай или прими помощь — баланс восстановится.",
+    "Прояви терпение. Посеянное растёт — оцени плоды, не торопя время.",
+    "Усердие и оттачивание навыка. Маленькие шаги ведут к мастерству.",
+    "Заслуженное изобилие и самодостаточность. Наслаждайся плодами труда.",
+    "Достаток, надёжность, семья. Прочный фундамент даёт чувство опоры.",
+    "Загорись новой целью и учись. День хорош для старта дела или знаний.",
+    "Надёжность и рутина сегодня в цене. Двигайся шаг за шагом — дойдёшь.",
+    "Сочетай заботу и практичность. Уют и дела прекрасно совмещаются.",
+    "День деловой хватки и стабильности. Управляй ресурсами уверенно."
+  ]}
+];
+
+// Собираем полную колоду из 78 карт
+const DECK = MAJORS.slice();
+for (const suit of SUITS) {
+  for (let r = 0; r < RANKS.length; r++) {
+    DECK.push([RANKS[r], suit.gen, suit.emoji, suit.means[r]]);
+  }
+}
+
+let lastCard = -1;
+function drawCard() {
+  let i;
+  do { i = Math.floor(Math.random() * DECK.length); }
+  while (i === lastCard && DECK.length > 1);
+  lastCard = i;
+  return DECK[i];
+}
+
+const stage = document.getElementById("stage");
+const tarot = document.getElementById("tarot");
+const meaning = document.getElementById("meaning");
+const go = document.getElementById("go");
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let busy = false;
+
+// Разлёт искорок вокруг карты
+function spawnSparkles() {
+  const emojis = ["✨","⭐","💫","🌟"];
+  for (let n = 0; n < 14; n++) {
+    const s = document.createElement("span");
+    s.className = "spark";
+    s.textContent = emojis[n % emojis.length];
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 70 + Math.random() * 70;
+    s.style.setProperty("--dx", Math.cos(angle) * dist + "px");
+    s.style.setProperty("--dy", Math.sin(angle) * dist + "px");
+    s.style.animationDelay = (Math.random() * 0.3) + "s";
+    stage.appendChild(s);
+    requestAnimationFrame(() => s.classList.add("go"));
+    setTimeout(() => s.remove(), 1400);
+  }
+}
+
+function reveal() {
+  if (busy) return;
+  busy = true;
+  go.disabled = true;
+
+  // 1. Прячем прошлый результат
+  meaning.classList.remove("show");
+  tarot.classList.remove("placeholder", "reveal", "show");
+
+  // 2. Магия: рубашка дрожит и светится + искры
+  tarot.classList.add("shuffling");
+  tarot.innerHTML = '<div class="back"><div class="back-glyph">✦</div></div>';
+  spawnSparkles();
+
+  const wait = reduceMotion ? 150 : 1100;
+
+  // 3. Переворот и показ карты
+  setTimeout(() => {
+    const [num, name, symbol, text] = drawCard();
+    tarot.classList.remove("shuffling");
+    tarot.classList.add("reveal");
+    tarot.innerHTML =
+      '<div class="num">' + num + '</div>' +
+      '<div class="symbol">' + symbol + '</div>' +
+      '<div class="cname">' + name + '</div>';
+    meaning.textContent = text;
+    requestAnimationFrame(() => {
+      tarot.classList.add("show");
+      meaning.classList.add("show");
+    });
+    go.disabled = false;
+    busy = false;
+  }, wait);
+}
+
+// Дата (обновляется, если страница открыта со вчера)
+function showDate() {
+  document.getElementById("date").textContent =
+    new Date().toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
+}
+showDate();
+setInterval(showDate, 60 * 1000);
+
+go.addEventListener("click", reveal);
+
+// Звёздный фон
+const cv = document.getElementById("stars");
+const ctx = cv.getContext("2d");
+const stars = Array.from({length: 80}, () => ({
+  x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+  r: Math.random()*1.5+0.3, a: Math.random()
+}));
+let animId = null;
+
+function paint(animate){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  for (const s of stars){
+    if (animate){
+      s.a += (Math.random()-0.5)*0.05;
+      s.a = Math.max(0.1, Math.min(1, s.a));
+    }
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = "rgba(255,255,255," + s.a + ")";
+    ctx.fill();
+  }
+}
+function animateStars(){
+  paint(true);
+  animId = requestAnimationFrame(animateStars);
+}
+function resize(){
+  cv.width = innerWidth; cv.height = innerHeight;
+  if (reduceMotion) paint(false);
+}
+
+resize();
+addEventListener("resize", resize);
+
+if (reduceMotion) {
+  paint(false);
+} else {
+  animateStars();
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) cancelAnimationFrame(animId);
+    else animateStars();
+  });
+}
+})();
+</script>
+</body>
+</html>
